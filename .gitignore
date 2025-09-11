@@ -1,0 +1,68 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+pip-wheel-metadata/
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables
+.env
+
+# Django
+# Keep the project DB out of source control for development
+db.sqlite3
+*.log
+local_settings.py
+
+# Uploaded media files
+/media/
+
+# Collected static files (created by collectstatic)
+/staticfiles/
+
+# It's recommended to commit app migrations. Do NOT ignore migration folders unless you
+# intentionally want to manage them outside VCS.
+# (Remove any patterns that try to ignore migrations.)
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Type/checker caches
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Node (if present)
+node_modules/
+
+# Misc
+coverage.xml

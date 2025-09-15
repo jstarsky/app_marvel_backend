@@ -162,3 +162,50 @@ These rules are enforced by Django password validators configured in `settings.p
 - If `python manage.py` fails, ensure your virtualenv is activated and Python is the correct interpreter.
 
 ---
+
+## Deployment / Railway notes
+
+When deploying to Railway (or any host) and using a separate frontend (Next.js/React), set these environment variables so CORS and cookie behavior work correctly:
+
+- `CORS_ALLOWED_ORIGINS` — comma-separated list of allowed origins. Example for local dev and a deployed frontend:
+    - `http://localhost:3000,https://your-frontend.up.railway.app`
+
+- `SESSION_COOKIE_SECURE` — set to `true` in production when using HTTPS. (Default `false` for local dev.)
+- `CSRF_COOKIE_SECURE` — set to `true` in production when using HTTPS. (Default `false` for local dev.)
+
+Examples on Railway (set these in the project Environment variables):
+
+```
+CORS_ALLOWED_ORIGINS=http://localhost:3000,https://your-frontend.up.railway.app
+SESSION_COOKIE_SECURE=true
+CSRF_COOKIE_SECURE=true
+DEBUG=False
+```
+
+Also ensure you run migrations during deployment so the token blacklist tables exist:
+
+```
+python manage.py migrate
+```
+
+If you prefer not to use server-side token blacklisting, remove `'rest_framework_simplejwt.token_blacklist'` from `INSTALLED_APPS` and avoid using blacklist API calls; logout will be client-side only.
+
+## Preflight test with curl
+
+To verify the backend responds to CORS preflight correctly (important when using credentials), run this OPTIONS request from a shell and check the response headers:
+
+```bash
+curl -i -X OPTIONS 'https://appmarvelbackend-production.up.railway.app/auth/login/' \
+    -H 'Origin: http://localhost:3000' \
+    -H 'Access-Control-Request-Method: POST' \
+    -H 'Access-Control-Request-Headers: content-type'
+```
+
+Expected headers (when configured correctly):
+
+- Access-Control-Allow-Origin: http://localhost:3000
+- Access-Control-Allow-Credentials: true
+- Access-Control-Allow-Methods: DELETE, GET, OPTIONS, PATCH, POST, PUT
+- Access-Control-Allow-Headers: content-type, authorization, x-csrftoken
+
+If you still see `Access-Control-Allow-Origin: *` or `Access-Control-Allow-Credentials` missing, redeploy after ensuring the `CORS_ALLOWED_ORIGINS` env var is set and the latest code is active.

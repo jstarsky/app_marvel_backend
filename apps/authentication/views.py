@@ -22,36 +22,47 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        # Run validation and return tokens+user on success.
-        # Be careful: accessing `serializer.errors` before `is_valid()` runs
-        # raises an AssertionError in DRF. Call `is_valid()` and handle
-        # validation or OperationalError from token creation separately.
         try:
-            serializer.is_valid(raise_exception=True)
-            return success_response(
-                data=serializer.validated_data
-            )
-        except OperationalError as oe:
-            # Token creation may attempt to write OutstandingToken (blacklist)
-            # which requires migrations. Surface a clear admin-guidance message.
+            serializer = self.get_serializer(data=request.data)
+            # Run validation and return tokens+user on success.
+            # Be careful: accessing `serializer.errors` before `is_valid()` runs
+            # raises an AssertionError in DRF. Call `is_valid()` and handle
+            # validation or OperationalError from token creation separately.
+            try:
+                serializer.is_valid(raise_exception=True)
+                return success_response(
+                    data=serializer.validated_data
+                )
+            except OperationalError as oe:
+                # Token creation may attempt to write OutstandingToken (blacklist)
+                # which requires migrations. Surface a clear admin-guidance message.
+                return error_response(
+                    message=(
+                        "tokens_unavailable: token storage not ready; ensure "
+                        "'rest_framework_simplejwt.token_blacklist' is migrated"
+                    ),
+                    errors=str(oe),
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            except Exception:
+                # Validation failed. Avoid accessing the `.errors` property
+                # directly because DRF raises if `.is_valid()` wasn't called
+                # (or in some edge cases). Use the internal `_errors` attr
+                # if present, otherwise return a generic invalid_credentials
+                # message so the client receives JSON (not an HTML 500 page).
+                errors = getattr(serializer, '_errors', None)
+                return error_response(
+                    message="invalid_credentials",
+                    errors=errors,
+                    status_code=status.HTTP_401_UNAUTHORIZED
+                )
+        except Exception as e:
+            # Catch any unexpected errors (e.g. serializer creation or other runtime
+            # issues) and return a JSON error response instead of an HTML 500 page.
             return error_response(
-                message=(
-                    "tokens_unavailable: token storage not ready; ensure "
-                    "'rest_framework_simplejwt.token_blacklist' is migrated"
-                ),
-                errors=str(oe),
+                message="login_failed",
+                errors=str(e),
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        except Exception:
-            # Validation failed. Only access `errors` property now that
-            # `is_valid()` was called (or raised). If there are no errors,
-            # fall back to a generic invalid_credentials message.
-            errors = getattr(serializer, '_errors', None) or getattr(serializer, 'errors', None)
-            return error_response(
-                message="invalid_credentials",
-                errors=errors,
-                status_code=status.HTTP_401_UNAUTHORIZED
             )
 
 @api_view(['POST'])

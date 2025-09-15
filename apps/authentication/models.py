@@ -1,29 +1,29 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User  # Import Django's default User
 
-class User(AbstractUser):
-    """
-    Custom User model extending AbstractUser
-    """
-    email = models.EmailField(blank=True, null=True)
-    username = models.CharField(max_length=150, unique=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = []
-
-    class Meta:
-        # Remove this line: db_table = 'auth_user'
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
-
-    def __str__(self):
-        return self.email or self.username
-
-    def get_full_name(self):
-        return f"{self.first_name} {self.last_name}".strip()
+# Comment out the entire custom User class to avoid conflicts
+# class User(AbstractUser):
+#     """
+#     Custom User model extending AbstractUser
+#     """
+#     email = models.EmailField(blank=True, null=True)
+#     username = models.CharField(max_length=150, unique=True)
+#     is_active = models.BooleanField(default=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+# 
+#     USERNAME_FIELD = 'username'
+#     REQUIRED_FIELDS = []
+# 
+#     class Meta:
+#         verbose_name = 'User'
+#         verbose_name_plural = 'Users'
+# 
+#     def __str__(self):
+#         return self.email or self.username
+# 
+#     def get_full_name(self):
+#         return f"{self.first_name} {self.last_name}".strip()
 
 class UserProfile(models.Model):
     """
@@ -41,4 +41,4 @@ class UserProfile(models.Model):
         verbose_name_plural = 'User Profiles'
 
     def __str__(self):
-        return f"{self.user.email or self.user.username}'s profile"
+        return f"{self.user.username}'s profile"

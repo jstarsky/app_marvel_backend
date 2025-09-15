@@ -1,3 +1,5 @@
+
+```
 app_marvel_backend/
 │
 ├── requirements.txt
@@ -15,6 +17,7 @@ app_marvel_backend/
 │   └── wsgi.py
 │
 # app_marvel_backend
+```
 
 Small Django REST API project for authentication.
 
@@ -159,10 +162,3 @@ These rules are enforced by Django password validators configured in `settings.p
 - If `python manage.py` fails, ensure your virtualenv is activated and Python is the correct interpreter.
 
 ---
-
-If you want, I can also:
-- Add a Postman collection or HTTPie examples
-- Add unit tests for the auth flows
-- Provide a short demo script that performs register -> login -> profile -> logout
-
-Tell me which one you'd like and I'll add it.

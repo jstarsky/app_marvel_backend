@@ -3,6 +3,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python manage.py makemigrations authentication && python manage.py collectstatic --noinput && python manage.py migrate --run-syncdb && gunicorn app_marvel_backend.wsgi"
+    "startCommand": "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn app_marvel_backend.wsgi"
   }
 }

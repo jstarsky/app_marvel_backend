@@ -63,8 +63,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # Default Django User model does not have `created_at` — use `date_joined`.
-        fields = ('id', 'username', 'is_active', 'date_joined')
-        read_only_fields = ('id', 'is_active', 'date_joined')
+    # include `profile` because it's declared on the serializer above
+    fields = ('id', 'username', 'is_active', 'date_joined', 'profile')
+    read_only_fields = ('id', 'is_active', 'date_joined')
 
 class PasswordChangeSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)

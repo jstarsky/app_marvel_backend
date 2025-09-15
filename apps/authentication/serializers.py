@@ -22,7 +22,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password_confirm')
         user = User.objects.create_user(**validated_data)
-        UserProfile.objects.create(user=user)
+        # UserProfile.objects.create(user=user)
         return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -63,7 +63,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # Default Django User model does not have `created_at` — use `date_joined`.
-        fields = ('id', 'username', 'is_active', 'date_joined', 'profile')
+        fields = ('id', 'username', 'is_active', 'date_joined')
         read_only_fields = ('id', 'is_active', 'date_joined')
 
 class PasswordChangeSerializer(serializers.Serializer):

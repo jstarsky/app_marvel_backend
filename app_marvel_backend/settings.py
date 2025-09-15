@@ -18,16 +18,21 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS_STR = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
 
+# Add Railway domain to allowed hosts if in production
 if not DEBUG:
+    # Railway automatically provides RAILWAY_STATIC_URL
     railway_url = os.environ.get('RAILWAY_STATIC_URL', '')
     if railway_url:
+        # Extract domain from Railway URL
         import re
         domain_match = re.search(r'https?://([^/]+)', railway_url)
         if domain_match:
             ALLOWED_HOSTS.append(domain_match.group(1))
     
+    # Also allow any railway.app domain
     ALLOWED_HOSTS.append('.railway.app')
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,7 +46,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

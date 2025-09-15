@@ -2,15 +2,22 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import exception_handler
 
-def success_response(data=None, message="Success", status_code=status.HTTP_200_OK):
+def success_response(data=None, message=None, status_code=status.HTTP_200_OK):
     """
-    Standard success response format
+    Standard success response format.
+
+    If `message` is None the response will omit the `message` key so clients
+    can rely on the HTTP status code and `success` flag. Callers can still
+    provide a message when useful.
     """
     response_data = {
         "success": True,
-        "message": message,
         "data": data
     }
+
+    if message is not None:
+        response_data["message"] = message
+
     return Response(response_data, status=status_code)
 
 def error_response(message="Error", errors=None, status_code=status.HTTP_400_BAD_REQUEST):

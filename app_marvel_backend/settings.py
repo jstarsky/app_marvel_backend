@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'app_marvel_backend.middleware.FallbackCORSHeadersMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files
@@ -114,12 +115,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS_STR = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000')
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_STR.split(',') if origin.strip()]
 
-# For development, allow all origins if DEBUG is True
+# Allow credentialed requests and prefer explicit allowed origins
+# In development keep a permissive origin list but allow credentials for localhost
+CORS_ALLOW_CREDENTIALS = True
+
+# When DEBUG is True we still populate allowed origins from env; don't use wildcard '*' when credentials are used
 if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    # In production, use specific origins
-    CORS_ALLOW_CREDENTIALS = True
+    # Keep explicit origins for local dev
+    if not CORS_ALLOWED_ORIGINS:
+        CORS_ALLOW_ALL_ORIGINS = True
+
 
 # Django REST Framework settings
 REST_FRAMEWORK = {
@@ -138,3 +143,13 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
 }
+
+# Cookie and security settings for cross-site frontend development
+# When using credentials from the browser (withCredentials / include), cookies need samesite=None and secure flags.
+SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
+CSRF_COOKIE_SAMESITE = None
+CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False').lower() == 'true'
+
+# If behind a proxy (like Railway), set this to ensure request.is_secure() works when using HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

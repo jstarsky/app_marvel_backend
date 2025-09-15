@@ -16,21 +16,16 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 # Parse ALLOWED_HOSTS from environment
 ALLOWED_HOSTS_STR = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
-ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
+if ALLOWED_HOSTS_STR == '*':
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
 
-# Add Railway domain to allowed hosts if in production
-if not DEBUG:
-    # Railway automatically provides RAILWAY_STATIC_URL
-    railway_url = os.environ.get('RAILWAY_STATIC_URL', '')
-    if railway_url:
-        # Extract domain from Railway URL
-        import re
-        domain_match = re.search(r'https?://([^/]+)', railway_url)
-        if domain_match:
-            ALLOWED_HOSTS.append(domain_match.group(1))
-    
-    # Also allow any railway.app domain
-    ALLOWED_HOSTS.append('.railway.app')
+# Always allow Railway domains in production
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    ALLOWED_HOSTS.extend(['.railway.app', '.up.railway.app'])
+    # Remove duplicates
+    ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
 # Application definition
 INSTALLED_APPS = [

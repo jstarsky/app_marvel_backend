@@ -9,8 +9,7 @@ urlpatterns = [
     path('register/', views.register_user, name='register'),
     path('logout/', views.logout_user, name='logout'),
     
-    # User profile endpoints
-    path('profile/', views.user_profile, name='user_profile'),
-    path('profile/update/', views.update_profile, name='update_profile'),
+    # User profile endpoints are intentionally removed/disabled to avoid
+    # depending on the optional UserProfile model in production.
     path('change-password/', views.change_password, name='change_password'),
 ]

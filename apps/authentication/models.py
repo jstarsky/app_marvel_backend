@@ -1,8 +1,5 @@
 from django.db import models
-
-# Create your models here.
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 
 class User(AbstractUser):
     """
@@ -18,12 +15,12 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     class Meta:
-        db_table = 'auth_user'
+        # Remove this line: db_table = 'auth_user'
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
     def __str__(self):
-        return self.email
+        return self.email or self.username
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
@@ -44,4 +41,4 @@ class UserProfile(models.Model):
         verbose_name_plural = 'User Profiles'
 
     def __str__(self):
-        return f"{self.user.email}'s profile"
+        return f"{self.user.email or self.user.username}'s profile"
